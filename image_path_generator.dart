@@ -32,13 +32,17 @@ void generateImagePath() {
 }
 
 /// 遍历assets文件夹
+int assetCount = 0;
+int totalAssetCount = 0;
+
 void handleAssetsFile(String path) {
   var directory = Directory(path);
   if (directory == null) {
     throw '$path is not a directory.';
   }
-
+  totalAssetCount += directory.listSync().length;
   for (var file in directory.listSync()) {
+    assetCount++;
     var type = file.statSync().type;
     if (type == FileSystemEntityType.directory) {
       directories.add('${file.path}/');
@@ -73,6 +77,12 @@ void handleAssetsFile(String path) {
       codeContent = '$codeContent\tstatic const String $key = \'$filePath\';\n';
     }
   }
+  printProgress('图片路径生成', assetCount, totalAssetCount);
+}
+
+void printProgress(String label, int count, int totalCount) {
+  double num = (count * 100) / totalCount;
+  print('*******$label*******${num.toStringAsFixed(2)}%');
 }
 
 /// 2. 替换图片资源路径
@@ -86,15 +96,18 @@ void replaceImagePath() {
 }
 
 /// 遍历lib文件夹
+int libCount = 0;
+int totalLibCount = 0;
+
 void handleLibFile(String path) {
   var directory = Directory(path);
   if (directory == null) {
     throw '$path is not a directory.';
   }
-
+  totalLibCount += directory.listSync().length;
   for (var file in directory.listSync()) {
+    libCount++;
     var type = file.statSync().type;
-
     if (type == FileSystemEntityType.directory) {
       handleLibFile('${file.path}/');
     } else if (type == FileSystemEntityType.file) {
@@ -123,6 +136,7 @@ void handleLibFile(String path) {
       File(file.path).writeAsStringSync(contents);
     }
   }
+  printProgress('图片路径替换', libCount, totalLibCount);
 }
 
 /// 在pubspec.yaml生成图片路径配置
