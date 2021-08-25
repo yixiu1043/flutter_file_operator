@@ -105,7 +105,7 @@ void replaceImagePath() {
   handleLibFile('lib/');
   imagePathMap.forEach((key, value) {
     if (!quotePaths.contains(value)) {
-      print('\x1B[33m====== $value 该图片资源没有引用，请手动删除 ======\x1B[0m\n');
+      print('\x1B[33m====== $value 该图片资源可能没有引用，请确认后手动删除 ======\x1B[0m\n');
     }
   });
 }
