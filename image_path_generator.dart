@@ -5,11 +5,27 @@ String pubspecContent = '';
 Map imagePathMap = {};
 List quotePaths = [];
 List directories = [];
+String packageName = 'flutter_file_operator'; // 包的名称
+List excludePaths = [
+  'lib/data',
+  'lib/event_bus',
+  'lib/login_game',
+  'lib/mixin',
+  'lib/netgen',
+  'lib/other_library',
+  'lib/routes',
+  'lib/service',
+  'lib/utils',
+  'lib/utils',
+  'lib/image_map.dart',
+  'lib/generated_plugin_registrant.dart'
+];
 
 void main() {
   generateImagePath();
   replaceImagePath();
   replacePubspec();
+  // print(['imagePathMap', imagePathMap]);
 }
 
 /// 1. 生成图片资源路径
@@ -28,7 +44,6 @@ void generateImagePath() {
   file.createSync();
   var contents = 'class $className {\n$codeContent\n}';
   file.writeAsString(contents);
-  // print(['imagePathMap', imagePathMap]);
 }
 
 /// 遍历assets文件夹
@@ -106,6 +121,8 @@ void handleLibFile(String path) {
   }
   totalLibCount += directory.listSync().length;
   for (var file in directory.listSync()) {
+    if (excludePaths.contains(file.path)) continue;
+    // print(['file.path>>>>>>>>>', file.path]);
     libCount++;
     var type = file.statSync().type;
     if (type == FileSystemEntityType.directory) {
@@ -113,8 +130,7 @@ void handleLibFile(String path) {
     } else if (type == FileSystemEntityType.file) {
       if (file.path.trim() == 'lib/image_map.dart') continue;
       String contents = File(file.path).readAsStringSync();
-      String import =
-          'import \'package:flutter_file_operator/image_map.dart\';\n';
+      String import = 'import \'package:$packageName/image_map.dart\';\n';
 
       imagePathMap.forEach((key, value) {
         if (contents.contains(value)) {
@@ -122,6 +138,7 @@ void handleLibFile(String path) {
             contents = import + contents;
           }
           contents = contents.replaceAll('\'$value\'', 'ImageMap.$key');
+          contents = contents.replaceAll('\"$value\"', 'ImageMap.$key');
           if (!quotePaths.contains(value)) {
             quotePaths.add(value);
           }
