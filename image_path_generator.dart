@@ -6,8 +6,6 @@ Map imagePathMap = {};
 List quotePaths = [];
 List directories = [];
 
-var logger;
-
 void main() {
   generateImagePath();
   replaceImagePath();
